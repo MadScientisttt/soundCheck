@@ -1,4 +1,25 @@
 import sounddevice as sd
+from typing import List, Tuple
+
+
+class DeviceManager:
+    def __init__(self):
+        self._current_devices = self._refresh_devices()  # 新增初始化
+
+    def _refresh_devices(self) -> List[Tuple[int, dict]]:
+        """获取最新输入设备列表"""
+        return [
+            (i, dev)
+            for i, dev in enumerate(sd.query_devices())
+            if dev['max_input_channels'] > 0
+        ]
+
+    def get_devices(self) -> List[str]:
+        """获取格式化设备列表"""
+        return [
+            f"[{idx}] {dev['name']}{' (默认)' if idx == sd.default.device[0] else ''}"
+            for idx, dev in self._current_devices
+        ]
 
 
 def list_input_devices():
